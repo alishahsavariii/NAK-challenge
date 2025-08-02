@@ -1,0 +1,26 @@
+{
+  "signUp": {
+    "title": "Sign Up",
+    "form": {
+      "nameLabel": "Name",
+      "lastName" : "lastName",
+      "userName" : "userName",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "submitButton": "Create",
+      "confirmPassword" : "confirmPassword"
+    },
+    "alreadyHaveAccount": "Already have an account?",
+    "signInLink": "Sign In"
+  },
+  "errors": {
+    "nameRequired": "Name is required.",
+    "invalidEmail": "Please enter a valid email address.",
+    "passwordTooShort": "Password must be at least 8 characters long.",
+    "registrationFailed": "Registration failed. Please try again.",
+    "lastName" : "lastName is required"
+  },
+  "common": {
+    "loading": "Loading..."
+  }
+}
