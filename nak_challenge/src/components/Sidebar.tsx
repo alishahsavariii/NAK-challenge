@@ -14,7 +14,7 @@ const SidebarContainer = styled.div`
   align-items: center;
   padding: 40px 0 24px 0;
   justify-content: space-between;
-  height : 900px
+  height : 700px
 `;
 
 

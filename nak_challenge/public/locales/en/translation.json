@@ -20,8 +20,8 @@
     "registrationFailed": "Registration failed. Please try again.",
     "lastName": "lastName is required",
     "userName": "userName is required",
-    "passwordDontMatch" : "password Dont Match",
-    "passwordRequired" : "password is required"
+    "passwordDontMatch": "password Dont Match",
+    "passwordRequired": "password is required"
   },
   "common": {
     "loading": "Loading..."
@@ -36,13 +36,23 @@
     "noAccount": "Don't have an account?",
     "signUpLink": "Sign up"
   },
-  "logout" : {
-    "Attributes" : "Attributes",
-    "Products" : "Products",
-     "LogOut" : "Logout",
-     "helloUser" : "Hello👋🏻",
-     "welcomeMassage" : "Im very happy you are here,I hope you find this dashboard easy and useful to use ☺️",
-     "message": "This is your dashboard. Enjoy your stay!"
-
-} 
+  "logout": {
+    "Attributes": "Attributes",
+    "Products": "Products",
+    "LogOut": "Logout",
+    "helloUser": "Hello👋🏻",
+    "welcomeMassage": "Im very happy you are here,I hope you find this dashboard easy and useful to use ☺️",
+    "message": "This is your dashboard. Enjoy your stay!"
+  },
+  "attributes": {
+    "loading": "Loading...",
+    "error": "Error:",
+    "attributes": "Attributes",
+    "AddAttribute": "Add Attribute",
+    "Name": "Name",
+    "Value": "Value",
+    "Cancel": "Cancel",
+    "ID": "ID",
+    "Values": "Values"
+  }
 }
