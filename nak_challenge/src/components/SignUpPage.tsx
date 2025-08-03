@@ -53,9 +53,10 @@ const Input = styled.input`
 
 const Actions = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: center;
   margin-top: 16px;
+  padding-left : 50px
 `;
 
 const SignInButton = styled.button`
@@ -64,6 +65,7 @@ const SignInButton = styled.button`
   color: #000;
   border-radius: 24px;
   padding: 8px 28px;
+
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
@@ -208,7 +210,7 @@ const SignUpForm: React.FC = () => {
         {apiError && <ErrorMessage>{t(apiError)}</ErrorMessage>}
 
         <Actions>
-          <SignInButton type="button">
+          <SignInButton type="button" onClick={() => navigate("/login")}>
             {t("signUp.alreadyHaveAccount")}
             <Link href="/login">{t("signUp.signInLink")}</Link>
           </SignInButton>

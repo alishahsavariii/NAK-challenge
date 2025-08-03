@@ -20,9 +20,20 @@
     "registrationFailed": "Registration failed. Please try again.",
     "lastName": "lastName is required",
     "userName": "userName is required",
-    "passwordDontMatch" : "password Dont Match"
+    "passwordDontMatch" : "password Dont Match",
+    "passwordRequired" : "password is required"
   },
   "common": {
     "loading": "Loading..."
+  },
+
+  "login": {
+    "title": "Sign In",
+    "form": {
+      "userName": "Username",
+      "password": "Password"
+    },
+    "noAccount": "Don't have an account?",
+    "signUpLink": "Sign up"
   }
 }
