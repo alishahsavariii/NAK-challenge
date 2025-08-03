@@ -1,21 +1,26 @@
 import { z } from 'zod';
 import { create } from 'zustand';
 
-const registerSchema = z.object({
-  name: z.string().min(1, { message: 'errors.nameRequired' }),
-  email: z.string().email({ message: 'errors.invalidEmail' }),
-  password: z.string().min(8, { message: 'errors.passwordTooShort' }),
-  lastName : z.string().min(1, { message: 'errors.lastName' }),
-  
+ // eslint-disable-next-line @typescript-eslint/no-unused-vars
+ const registerSchema = z.object({
+  firstName: z.string().min(1, { message: "errors.nameRequired" }),
+  lastName: z.string().min(1, { message: "errors.lastName" }),
+  userName: z.string().min(1, { message: "errors.userName" }),
+  password: z.string().min(8, { message: "errors.passwordTooShort" }),
+  confirmPassword: z.string().min(8, { message: "errors.passwordTooShort" }),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "errors.passwordsDontMatch",
+  path: ["confirmPassword"],
 });
 
-// Infer the TypeScript type from the schema
 export type RegisterFormData = z.infer<typeof registerSchema>;
+
+type RegisterApiData = Omit<RegisterFormData, "confirmPassword">;
 
 interface AuthState {
   isLoading: boolean;
   error: string | null;
-  register: (data: RegisterFormData) => Promise<boolean>; 
+  register: (data: RegisterApiData) => Promise<boolean>; 
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -24,10 +29,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   register: async (data) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch('/api/users/register', { 
+      const response = await fetch('api/users/register', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
+        
       });
 
       if (!response.ok) {
@@ -38,7 +44,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ isLoading: false });
       return true;
 
-    } catch (err: any) {
+    } catch (err) {
       set({ isLoading: false, error: err.message });
       return false;
     }

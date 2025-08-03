@@ -1,161 +1,128 @@
-import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next"; // For i18n
-import { Link, useNavigate } from "react-router-dom";
+import React from "react";
 import styled from "@emotion/styled";
-import { zodResolver } from "@hookform/resolvers/zod";
-
-// We need the schema for the resolver, but it's already in the store file.
-// In a real app, you might put the Zod schema in a shared types file.
-import { z } from "zod";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { RegisterFormData, useAuthStore } from "../stores/authStore";
-const registerSchema = z.object({
-  name: z.string().min(1, { message: "errors.nameRequired" }),
-  email: z.string().email({ message: "errors.invalidEmail" }),
-  password: z.string().min(8, { message: "errors.passwordTooShort" }),
-  lastName: z.string().min(1, { message: "errors.lastName" }),
-});
+import { useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
+import z from "zod";
 
-// EmotionJS Styled Components
-const PageContainer = styled.div`
-  display: flex;
-  width: 100%;
-  min-height: 100vh;
-  background-color: #f7f8fa;
-`;
-
-const FormContainer = styled.main`
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-
-  height: 726px;
-  background-color: #fafafaff;
-
-  @media (min-width: 1024px) {
-    flex-basis: 50%;
-  }
-`;
-
-const FormWrapper = styled.div`
-  width: 550px;
-  height : 526px;
-  background-color: #ffffff;
-  border-radius : 40px
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #00000;
-  margin-bottom: 0.5rem;
-  padding : 0.5rem 5rem
- 
-`;
-
-const Subtitle = styled.p`
-  color: #6c757d;
-  margin-bottom: 2.5rem;
-`;
-
-const StyledForm = styled.form`
-  width: 100%;
+const Container = styled.div`
+  background: #fff;
+  border-radius: 32px;
+  box-shadow: 0 0 0 0 transparent;
+  width: 600px;
+  max-width: 90vw;
+  margin: 60px auto;
+  padding: 48px 40px 32px 40px;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 32px;
 `;
 
-const InputWrapper = styled.div`
-  position: relative;
-  margin : 10px 80px;
-  border-radius: 40px;
-  
-
+const Title = styled.h2`
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0px 0 16px 80px;
 `;
 
-const Label = styled.label`
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #495057;
-  margin-bottom: 0.5rem;
-  width : 80%
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 `;
 
 const Input = styled.input`
-  width: 70%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #ced4da;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
-
-
-  &:focus {
-    outline: none;
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
-  }
-`;
-
-const ErrorMessage = styled.p`
-  color: #dc3545;
-  font-size: 0.8rem;
-  margin-top: 0.25rem;
-`;
-
-const SubmitButton = styled.button`
   width: 100%;
-  padding: 0.875rem;
+  padding: 18px 24px;
   border: none;
-  border-radius: 8px;
-  background-color: #0d6efd;
-  color: white;
+  border-radius: 32px;
+  background: #f5f5f5;
+  font-size: 1.1rem;
+  color:#000000;
+  font-weight: 500;
+  outline: none;
+  transition: box-shadow 0.2s;
+  &::placeholder {
+    color: #bdbdbd;
+    opacity: 1;
+    font-weight: 500;
+  }
+`;
+
+
+const Actions = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+`;
+
+const SignInButton = styled.button`
+  border: 1.5px solid #000;
+  background: #fff;
+  color: #000;
+  border-radius: 24px;
+  padding: 8px 28px;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
-
+  transition: background 0.2s;
   &:hover {
-    background-color: #0b5ed7;
-  }
-
-  &:disabled {
-    background-color: #a0c7ff;
-    cursor: not-allowed;
+    background: #f5f5f5;
   }
 `;
 
-const SignInLink = styled.p`
-  text-align: center;
-  color: #6c757d;
-  margin-top: 1.5rem;
+const ArrowButton = styled.button`
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  width: 90px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background: #222;
+  }
+`;
+const ErrorMessage = styled.p`
+   color: #dc3545;
+   font-size: 0.8rem;
+   margin-top: 0.25rem;
+`;
 
-  a {
-    color: #0d6efd;
-    font-weight: 600;
-    text-decoration: none;
-    &:hover {
-      text-decoration: underline;
+const Link = styled.a`
+      color: #0d6efd;
+      font-weight: 600;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
     }
-  }
-`;
+  `;
+const InputWrapper = styled.div`
+  position: relative;
+  margin : 10px 80px;
+  border-radius: 40px`
 
-const ImageContainer = styled.aside`
-  display: none; // Hidden on mobile
+  
+  const registerSchema = z.object({
+    firstName: z.string().min(1, { message: "errors.nameRequired" }),
+    lastName: z.string().min(1, { message: "errors.lastName" }),
+    userName: z.string().min(1, { message: "errors.userName" }),
+    password: z.string().min(8, { message: "errors.passwordTooShort" }),
+    confirmPassword : z.string().min(8, { message: "errors.passwordTooShort" }),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: "errors.passwordDontMatch",
+    path: ["confirmPassword"],
+  });
 
-  @media (min-width: 1024px) {
-    display: block;
-    flex-basis: 50%;
-    background-image: url("/path/to/your/image.jpg"); // **REPLACE THIS PATH**
-    background-size: cover;
-    background-position: center;
-  }
-`;
-
-// The main component
-export function SignUpPage() {
+const SignUpForm: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { register: registerUser, isLoading, error: apiError } = useAuthStore();
@@ -169,93 +136,96 @@ export function SignUpPage() {
   });
 
   const onSubmit = async (data: RegisterFormData) => {
-    const success = await registerUser(data);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { confirmPassword, ...apiData } = data; 
+    const success = await registerUser(apiData);
     if (success) {
       navigate("/login");
     }
   };
 
   return (
-    <PageContainer>
-      <FormContainer>
-        <FormWrapper>
-          <Title>{t("signUp.title")}</Title>
-          <StyledForm onSubmit={handleSubmit(onSubmit)} noValidate>
-            <InputWrapper>
-              <Input
-                id="name"
-                placeholder={t("signUp.form.nameLabel")}
-                type="text"
-                {...register("name")}
-              />
-              {errors.name && (
-                <ErrorMessage>{t(errors.name.message as string)}</ErrorMessage>
-              )}
-            </InputWrapper>
-            <InputWrapper>
-              <Input
-                id="lastname"
-                placeholder={t("signUp.form.lastName")}
-                type="text"
-                {...register("lastName")}
-              />
-              {errors.name && (
-                <ErrorMessage>{t(errors.name.message as string)}</ErrorMessage>
-              )}
-            </InputWrapper>
+    <Container>
+      <Title> {t("signUp.title")}</Title>
+      <Form onSubmit={handleSubmit(onSubmit)} noValidate>
+        <InputWrapper>
+          <Input
+            id="firstName"
+            type="text"
+            placeholder={t("signUp.form.nameLabel")}
+            {...register("firstName")}/>
+            {errors.firstName && (
+              <ErrorMessage>{t(errors.firstName.message as string)}</ErrorMessage>
+            )}
+        </InputWrapper>
+        <InputWrapper>
+          <Input
+            type="text"
+            id="lastName"
+            placeholder={t("signUp.form.lastName")}
+            {...register("lastName")}
+          />
+            {errors.firstName && (
+              <ErrorMessage>{t(errors.firstName.message as string)}</ErrorMessage>
+            )}
+        </InputWrapper>
+        <InputWrapper>
+          <Input
+            id="userName"
+            placeholder={t("signUp.form.userName")}
+            type="text"
+            {...register("userName")}
+          />
+            {errors.firstName && (
+              <ErrorMessage>{t(errors.firstName.message as string)}</ErrorMessage>
+            )}
+        </InputWrapper>
+        <InputWrapper>
+          <Input
+            type="password"
+            id="password"
+            placeholder={t("signUp.form.passwordLabel")}
+            {...register("password")}
+          />
+            {errors.password && (
+              <ErrorMessage>
+                {t(errors.password.message as string)}
+              </ErrorMessage>
+            )}
+        </InputWrapper>
+        <InputWrapper>
+          <Input
+            id="confirmPassword"
+            type="password"
+            placeholder={t("signUp.form.confirmPassword")}
+            {...register("confirmPassword")}
+          />
+            {errors.password && (
+              <ErrorMessage>{t(errors.password.message as string)}</ErrorMessage>
+            )}
+        </InputWrapper>
+        {apiError && <ErrorMessage>{t(apiError)}</ErrorMessage>}
 
-            {/* <InputWrapper>
-              <Input
-                id="userName"
-                placeholder={t("signUp.form.nameLabel")}
-                type="text"
-                {...register("userName")}
-              />
-              {errors.name && (
-                <ErrorMessage>{t(errors.name.message as string)}</ErrorMessage>
-              )}
-            </InputWrapper> */}
-
-            <InputWrapper>
-              <Input
-                id="email"
-                placeholder={t("signUp.form.emailLabel")}
-                type="email"
-                {...register("email")}
-              />
-              {errors.email && (
-                <ErrorMessage>{t(errors.email.message as string)}</ErrorMessage>
-              )}
-            </InputWrapper>
-
-            <InputWrapper>
-              <Input
-                id="password"
-                placeholder={t("signUp.form.passwordLabel")}
-                type="password"
-                {...register("password")}
-              />
-              {errors.password && (
-                <ErrorMessage>
-                  {t(errors.password.message as string)}
-                </ErrorMessage>
-              )}
-            </InputWrapper>
-
-            {apiError && <ErrorMessage>{t(apiError)}</ErrorMessage>}
-
-            <SubmitButton type="submit" disabled={isLoading}>
-              {isLoading ? t("common.loading") : t("signUp.form.submitButton")}
-            </SubmitButton>
-          </StyledForm>
-
-          <SignInLink>
-            {t("signUp.alreadyHaveAccount")}{" "}
-            <Link to="/login">{t("signUp.signInLink")}</Link>
-          </SignInLink>
-        </FormWrapper>
-      </FormContainer>
-      <ImageContainer />
-    </PageContainer>
+        <Actions>
+          <SignInButton type="button">
+            {t("signUp.alreadyHaveAccount")}
+            <Link href="/login">{t("signUp.signInLink")}</Link>
+          </SignInButton>
+          <ArrowButton
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? t("common.loading") :
+              <svg width="28" height="28" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M5 12h14M13 6l6 6-6 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            }
+          </ArrowButton>
+        </Actions>
+      </Form>
+    </Container>
   );
-}
+};
+
+export default SignUpForm;

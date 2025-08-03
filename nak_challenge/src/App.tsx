@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import { SignUpPage } from './components/SignUpPage';
+import SignUpForm from './components/SignUpPage';
 
 const LoginPage = () => <div>Login Page</div>;
 const DashboardPage = () => <div>Welcome to your Dashboard!</div>;
@@ -7,9 +7,8 @@ const DashboardPage = () => <div>Welcome to your Dashboard!</div>;
 function App() {
   return (
     <Routes>
-      {/* Public routes */}
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/signup" element={<SignUpForm />} />
 
       <Route path="/" element={<DashboardPage />} />
 
