@@ -74,8 +74,10 @@ const TableCell = styled.td`
 const TopBar = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40px;
+  align-items: right;
+  margin-bottom: 60px;
+  margin-left : 300px
+  // width : 70%
 `;
 
 const AddButton = styled.button`
@@ -636,14 +638,17 @@ const Products: React.FC = () => {
         (attr) => attr.values
       );
 
-      const cartesianProduct = (arrays: string[][]): string[][] => {
-        return arrays.reduce(
-          (a, b) => {
-            return a.flatMap((d) => b.map((e) => [d, e].flat()));
-          },
-          [[]]
-        ) as string[][];
-      };
+   const cartesianProduct = (arrays: string[][]): string[][] => {
+  return arrays.reduce((acc, arr) => {
+    const result: string[][] = [];
+    acc.forEach(a => {
+      arr.forEach(b => {
+        result.push([...a, b]);
+      });
+    });
+    return result;
+  }, [[]] as string[][]);
+};
 
       const generatedCombinations = cartesianProduct(arraysToCombine);
 
@@ -881,7 +886,6 @@ const Products: React.FC = () => {
                 products.map((product, index) => (
                   <tr key={product._id}>
                     {" "}
-                    {/* Use product._id for key */}
                     <TableCell>
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </TableCell>
@@ -965,7 +969,6 @@ const Products: React.FC = () => {
         </>
       ) : (
         <>
-          {/* Product Name Input */}
           <FloatingFormField>
             <Input
               type="text"
@@ -978,13 +981,9 @@ const Products: React.FC = () => {
             <Label htmlFor="product-name">Name</Label>
           </FloatingFormField>
 
-          {/* Attribute Selection Section */}
           <FormSectionTitle>Attribute Form</FormSectionTitle>
           {productForm.selectedAttributes.map((attr, index) => (
             <FormRow key={attr.name}>
-              {" "}
-              {/* Key using attributeId */}
-              {/* Already Added Attribute Name (Read-only display) */}
               <FloatingFormField style={{ flex: 1 }}>
                 <Input
                   type="text"
@@ -1006,7 +1005,6 @@ const Products: React.FC = () => {
                 />
                 <Label htmlFor={`attr-values-${index}`}>Attribute Values</Label>
               </FloatingFormField>
-              {/* Delete Button for Added Attribute */}
               <AttributeRowActions>
                 <DeleteAttributeButton
                   onClick={() => {
@@ -1021,9 +1019,7 @@ const Products: React.FC = () => {
             </FormRow>
           ))}
 
-          {/* New Attribute Addition Row */}
           <FormRow>
-            {/* Attribute Name Dropdown (Native Select) */}
             <FloatingFormField style={{ flex: 1 }}>
               <Select
                 value={newAttributeSelection._id}
