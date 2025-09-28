@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, LoginFormData } from "../stores/authStore"; // adjust path as needed
 import { useAuthStore } from "../stores/authStore";
+import { useMutation } from "@tanstack/react-query";
 
 const Container = styled.div`
   background: #fff;
@@ -127,11 +128,22 @@ const SignInPage: React.FC = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = async (data: LoginFormData) => {
-    const success = await login(data);
-    if (success) {
+  const mutation = useMutation({
+    mutationFn: async (data: LoginFormData) => {
+      const ok = await login(data);
+      if (!ok) {
+        const storeError = useAuthStore.getState().error;
+        throw new Error(storeError ?? "errors.loginFailed");
+      }
+      return true;
+    },
+    onSuccess: () => {
       navigate("/dashboard");
-    }
+    },
+  });
+
+  const onSubmit = (data: LoginFormData) => {
+    mutation.mutate(data);
   };
 
   return (
@@ -168,7 +180,7 @@ const SignInPage: React.FC = () => {
             <Link href="/signup">{t("login.signUpLink")}</Link>
           </SignUpButton>
           <ArrowButton type="submit" disabled={isLoading}>
-            {isLoading ? t("common.loading") :
+            {mutation?.isPending ? t("common.loading") :
               <svg width="28" height="28" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
                 <path d="M5 12h14M13 6l6 6-6 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>

@@ -4,8 +4,9 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { RegisterFormData, useAuthStore } from "../stores/authStore";
 import { useForm } from "react-hook-form";
-import { zodResolver } from '@hookform/resolvers/zod';
+import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
+import { useMutation } from "@tanstack/react-query";
 
 const Container = styled.div`
   background: #fff;
@@ -39,7 +40,7 @@ const Input = styled.input`
   border-radius: 32px;
   background: #f5f5f5;
   font-size: 1.1rem;
-  color:#000000;
+  color: #000000;
   font-weight: 500;
   outline: none;
   transition: box-shadow 0.2s;
@@ -50,13 +51,12 @@ const Input = styled.input`
   }
 `;
 
-
 const Actions = styled.div`
   display: flex;
   justify-content: space-evenly;
   align-items: center;
   margin-top: 16px;
-  padding-left : 50px
+  padding-left: 50px;
 `;
 
 const SignInButton = styled.button`
@@ -93,33 +93,35 @@ const ArrowButton = styled.button`
   }
 `;
 const ErrorMessage = styled.p`
-   color: #dc3545;
-   font-size: 0.8rem;
-   margin-top: 0.25rem;
+  color: #dc3545;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
 `;
 
 const Link = styled.a`
-      color: #0d6efd;
-      font-weight: 600;
-      text-decoration: none;
-      &:hover {
-        text-decoration: underline;
+        color: #0d6efd;
+        font-weight: 600;
+        text-decoration: none;
+        &:hover {
+          text-decoration: underline;
+        }
       }
-    }
-  `;
+    `;
 const InputWrapper = styled.div`
   position: relative;
-  margin : 10px 80px;
-  border-radius: 40px`
+  margin: 10px 80px;
+  border-radius: 40px;
+`;
 
-  
-  const registerSchema = z.object({
+const registerSchema = z
+  .object({
     firstName: z.string().min(1, { message: "errors.nameRequired" }),
     lastName: z.string().min(1, { message: "errors.lastName" }),
     userName: z.string().min(1, { message: "errors.userName" }),
     password: z.string().min(8, { message: "errors.passwordTooShort" }),
-    confirmPassword : z.string().min(8, { message: "errors.passwordTooShort" }),
-  }).refine((data) => data.password === data.confirmPassword, {
+    confirmPassword: z.string().min(8, { message: "errors.passwordTooShort" }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
     message: "errors.passwordDontMatch",
     path: ["confirmPassword"],
   });
@@ -137,15 +139,26 @@ const SignUpForm: React.FC = () => {
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = async (data: RegisterFormData) => {
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { confirmPassword, ...apiData } = data; 
-    const success = await registerUser(apiData);
-    if (success) {
+  const mutation = useMutation({
+    mutationFn: async (data: Omit<RegisterFormData, "confirmPassword">) => {
+      const ok = await registerUser(data);
+      if (!ok) {
+        const storeError = useAuthStore.getState().error;
+        throw new Error(storeError ?? "errors.registrationFailed");
+      }
+      return true;
+    },
+    onSuccess: () => {
       navigate("/login");
-    }
+    },
+  });
+
+  const onSubmit = (data: RegisterFormData) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { confirmPassword, ...apiData } = data;
+    mutation.mutate(apiData);
   };
+  const isSubmitting = mutation.isPending;
 
   return (
     <Container>
@@ -156,10 +169,11 @@ const SignUpForm: React.FC = () => {
             id="firstName"
             type="text"
             placeholder={t("signUp.form.nameLabel")}
-            {...register("firstName")}/>
-            {errors.firstName && (
-              <ErrorMessage>{t(errors.firstName.message as string)}</ErrorMessage>
-            )}
+            {...register("firstName")}
+          />
+          {errors.firstName && (
+            <ErrorMessage>{t(errors.firstName.message as string)}</ErrorMessage>
+          )}
         </InputWrapper>
         <InputWrapper>
           <Input
@@ -168,9 +182,9 @@ const SignUpForm: React.FC = () => {
             placeholder={t("signUp.form.lastName")}
             {...register("lastName")}
           />
-            {errors.firstName && (
-              <ErrorMessage>{t(errors.firstName.message as string)}</ErrorMessage>
-            )}
+          {errors.firstName && (
+            <ErrorMessage>{t(errors.firstName.message as string)}</ErrorMessage>
+          )}
         </InputWrapper>
         <InputWrapper>
           <Input
@@ -179,9 +193,9 @@ const SignUpForm: React.FC = () => {
             type="text"
             {...register("userName")}
           />
-            {errors.firstName && (
-              <ErrorMessage>{t(errors.firstName.message as string)}</ErrorMessage>
-            )}
+          {errors.firstName && (
+            <ErrorMessage>{t(errors.firstName.message as string)}</ErrorMessage>
+          )}
         </InputWrapper>
         <InputWrapper>
           <Input
@@ -190,11 +204,9 @@ const SignUpForm: React.FC = () => {
             placeholder={t("signUp.form.passwordLabel")}
             {...register("password")}
           />
-            {errors.password && (
-              <ErrorMessage>
-                {t(errors.password.message as string)}
-              </ErrorMessage>
-            )}
+          {errors.password && (
+            <ErrorMessage>{t(errors.password.message as string)}</ErrorMessage>
+          )}
         </InputWrapper>
         <InputWrapper>
           <Input
@@ -203,9 +215,9 @@ const SignUpForm: React.FC = () => {
             placeholder={t("signUp.form.confirmPassword")}
             {...register("confirmPassword")}
           />
-            {errors.password && (
-              <ErrorMessage>{t(errors.password.message as string)}</ErrorMessage>
-            )}
+          {errors.password && (
+            <ErrorMessage>{t(errors.password.message as string)}</ErrorMessage>
+          )}
         </InputWrapper>
         {apiError && <ErrorMessage>{t(apiError)}</ErrorMessage>}
 
@@ -214,15 +226,27 @@ const SignUpForm: React.FC = () => {
             {t("signUp.alreadyHaveAccount")}
             <Link href="/login">{t("signUp.signInLink")}</Link>
           </SignInButton>
-          <ArrowButton
-            type="submit"
-            disabled={isLoading}
-          >
-            {isLoading ? t("common.loading") :
-              <svg width="28" height="28" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
-                <path d="M5 12h14M13 6l6 6-6 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <ArrowButton type="submit" disabled={isLoading}>
+            {isLoading ? (
+              t("common.loading")
+            ) : (
+              <svg
+                width="28"
+                height="28"
+                fill="none"
+                stroke="white"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M5 12h14M13 6l6 6-6 6"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
-            }
+            )}
           </ArrowButton>
         </Actions>
       </Form>

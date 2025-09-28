@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "@emotion/styled";
 import { useAuthStore } from "../stores/authStore";
 import { useTranslation } from "react-i18next";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const AttributesContainer = styled.div`
   padding: 10px;
-  // background: #fdfdfd;
   min-height: calc(100vh - 40px);
   width: 100%;
 `;
@@ -21,11 +21,9 @@ const TableHeader = styled.th`
   background: #d7d7d7ff;
   padding: 15px 20px;
   text-align: left;
-  border-bottom: 1px solid
+  border-bottom: 1px solid #ccc;
   color: #333;
   font-weight: 600;
-
-
 `;
 
 const TableCell = styled.td`
@@ -86,7 +84,7 @@ const Input = styled.input`
 const ValueInputGroup = styled.div`
   display: inline-flex;
   align-items: flex-end;
-  justify-content : space-around
+  justify-content: space-around;
   margin-bottom: 20px;
 
   ${FormField} {
@@ -163,38 +161,56 @@ interface Attribute {
 }
 
 const Attributes: React.FC = () => {
-  const [attributes, setAttributes] = useState<Attribute[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const token = useAuthStore((s) => s.accessToken);
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<{ name: string; values: string[] }>({
     name: "",
     values: [""],
   });
-  const [saving, setSaving] = useState(false);
-  const token = useAuthStore((state) => state.accessToken);
-  const { t } = useTranslation();
 
-  useEffect(() => {
-    const fetchAttributes = async () => {
-      try {
-        const response = await fetch("/api/attributes", {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!response.ok) throw new Error("Network response was not ok");
-        const data: Attribute[] = await response.json();
-        setAttributes(data);
-      } catch (error: any) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
+  const {
+    data: attributes = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery<Attribute[], Error>({
+    queryKey: ["attributes"],
+    queryFn: async () => {
+      const res = await fetch("/api/attributes", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error("Failed to fetch attributes");
+      return res.json();
+    },
+  });
+
+  const mutation = useMutation({
+    mutationFn: async (data: { name: string; values: string[] }) => {
+      const res = await fetch("/api/attributes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || "Failed to save attribute");
       }
-    };
-    fetchAttributes();
-  }, [token]);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["attributes"] });
+      setShowForm(false);
+    },
+  });
 
   const handleAddClick = () => {
     setShowForm(true);
@@ -216,85 +232,52 @@ const Attributes: React.FC = () => {
     setForm({ ...form, values: newValues });
   };
 
-  const handleAddValueField = () => {
+  const handleAddValueField = () =>
     setForm({ ...form, values: [...form.values, ""] });
-  };
 
-  const handleSave = async () => {
-    setSaving(true);
+  const handleSave = () => {
     const dataToSend = {
       ...form,
       values: form.values.filter((v) => v.trim() !== ""),
     };
 
-    if (!dataToSend.name.trim()) {
-      alert("Attribute name cannot be empty.");
-      setSaving(false);
-      return;
-    }
-    if (dataToSend.values.length === 0) {
-      alert("At least one value is required.");
-      setSaving(false);
+    if (!dataToSend.name.trim() || dataToSend.values.length === 0) {
+      alert("Name and at least one value are required.");
       return;
     }
 
-    try {
-      const response = await fetch("/api/attributes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(dataToSend),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to save attribute");
-      }
-
-      const newAttribute: Attribute = await response.json();
-      setAttributes([...attributes, newAttribute]);
-      setShowForm(false);
-    } catch (e: any) {
-      alert(e.message);
-    } finally {
-      setSaving(false);
-    }
+    mutation.mutate(dataToSend);
   };
 
-  if (loading) return <div>{t("attributes.loading")}</div>;
-  if (error)
+  if (isLoading) return <div>{t("attributes.loading")}</div>;
+  if (isError)
     return (
       <div>
-        {t("attributes.error")} {error}
+        {t("attributes.error")} {error?.message}
       </div>
     );
 
   return (
     <AttributesContainer>
       {showForm ? (
-        <h1 style={{ fontWeight: 700, marginBottom: "40px" }}>{t("attributes.AddAttribute")}</h1>
+        <h1 style={{ fontWeight: 700, marginBottom: "40px" }}>
+          {t("attributes.AddAttribute")}
+        </h1>
       ) : (
         <TopBar>
           <h1 style={{ fontWeight: 700 }}>{t("attributes.AddAttribute")}</h1>
           <AddButton onClick={handleAddClick}>
-            {t("attributes.AddAttribute")}
+            {t("attributes.AddAttribute")}{" "}
             <span style={{ fontSize: 20, marginLeft: 4 }}>+</span>
           </AddButton>
         </TopBar>
       )}
 
-      {showForm ? (
+      {showForm && (
         <>
           <FormField>
             <Label>{t("attributes.Name")}</Label>
-            <Input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChangeName}
-            />
+            <Input type="text" value={form.name} onChange={handleChangeName} />
           </FormField>
 
           {form.values.map((value, index) => (
@@ -303,7 +286,6 @@ const Attributes: React.FC = () => {
                 <Label>{t("attributes.Value")}</Label>
                 <Input
                   type="text"
-                  name={`value-${index}`}
                   value={value}
                   onChange={(e) => handleChangeValue(index, e)}
                 />
@@ -315,15 +297,17 @@ const Attributes: React.FC = () => {
           ))}
 
           <ButtonRow>
-            <CancelButton onClick={handleCancel} disabled={saving}>
+            <CancelButton onClick={handleCancel} disabled={mutation.isPending}>
               {t("attributes.Cancel")}
             </CancelButton>
-            <SaveButton onClick={handleSave} disabled={saving}>
-              {saving ? "Saving..." : "Save"}
+            <SaveButton onClick={handleSave} disabled={mutation.isPending}>
+              {mutation.isPending ? "Saving..." : "Save"}
             </SaveButton>
           </ButtonRow>
         </>
-      ) : (
+      )}
+
+      {!showForm && (
         <Table>
           <thead>
             <tr>
@@ -333,12 +317,11 @@ const Attributes: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {attributes.map((attribute, index) => (
-              <tr key={attribute.id}>
+            {attributes?.map((attr, index) => (
+              <tr key={index}>
                 <TableCell>{index + 1}</TableCell>
-                 {/* id is not valid in api :) */}
-                <TableCell>{attribute.name || "---"}</TableCell>
-                <TableCell>{attribute.values.join(", ") || "---"}</TableCell>
+                <TableCell>{attr.name || "---"}</TableCell>
+                <TableCell>{attr.values.join(", ") || "---"}</TableCell>
               </tr>
             ))}
           </tbody>
