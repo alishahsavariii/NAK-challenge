@@ -1057,6 +1057,9 @@ const Products: React.FC = () => {
                 disabled={!newAttributeSelection._id}
                 id="new-attr-values"
                 showClear
+                closeIcon
+                checkboxIcon
+                
                 display="comma"
               />
               <Label htmlFor="new-attr-values">Attribute Values</Label>

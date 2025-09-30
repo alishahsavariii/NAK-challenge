@@ -32,8 +32,4 @@
       margin: 10px;
     }
   }
-  & > ul {
-    & > li :hover {
-    }
-  }
 }
