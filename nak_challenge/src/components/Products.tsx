@@ -2,6 +2,9 @@ import React, { useEffect, useState, useMemo } from "react";
 import styled from "@emotion/styled";
 import { useAuthStore } from "../stores/authStore";
 import { MultiSelect } from "primereact/multiselect";
+import { Dropdown } from "primereact/dropdown";
+
+import "../assets/products.css";
 
 interface Attribute {
   _id: string;
@@ -76,7 +79,7 @@ const TopBar = styled.div`
   justify-content: space-between;
   align-items: right;
   margin-bottom: 60px;
-  margin-left : 300px
+  margin-left: 300px;
   // width : 70%
 `;
 
@@ -190,7 +193,7 @@ const Input = styled.input`
   }
 `;
 
-const Select = styled.select`
+const Select = styled(Dropdown)`
   width: 100%;
   padding: 16px 16px;
   border-radius: 20px;
@@ -232,7 +235,6 @@ const Label = styled.label<{ $isFilledOrFocused?: boolean }>`
   padding: 0 4px;
   z-index: 2;
 
- 
   ${Input}:focus + &,
   ${Input}:not(:placeholder-shown) + &,
   ${Select}:focus + &,
@@ -246,7 +248,6 @@ const Label = styled.label<{ $isFilledOrFocused?: boolean }>`
     z-index: 1;
   }
 
- 
   .p-multiselect.p-focus ~ &,
   .p-multiselect:not(.p-multiselect-empty) ~ & {
     top: 0;
@@ -260,28 +261,25 @@ const Label = styled.label<{ $isFilledOrFocused?: boolean }>`
 `;
 
 const StyledMultiSelect = styled(MultiSelect)`
-  width: 60%;
+  width: 90%;
 
-  .p-multiselect {
-    width: 100%;
-    padding: 16px 16px;
-    border-radius: 20px;
-    border: 1px solid #ddd;
-    font-size: 16px;
-    outline: none;
-    background: #fff;
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    color: #333;
-    min-height: 48px;
+  padding: 16px 16px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  color: #333;
+  min-height: 48px;
 
-    &:not(.p-disabled):hover {
-      border-color: #aaa;
-    }
+  &:not(.p-disabled):hover {
+    border-color: #aaa;
+  }
 
-    &:not(.p-disabled).p-focus {
-      border-color: #000;
-      box-shadow: 0 0 0 1px #000;
-    }
+  &:not(.p-disabled).p-focus {
+    border-color: #000;
+    box-shadow: 0 0 0 1px #000;
   }
 
   .p-multiselect-label {
@@ -298,9 +296,9 @@ const StyledMultiSelect = styled(MultiSelect)`
   }
 
   .p-multiselect-panel {
-    border-radius: 10px;
+    border-radius: 100px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    background-color: #ddd;
+    backgruound: #000;
   }
 
   .p-multiselect-header {
@@ -343,17 +341,16 @@ const DeleteAttributeButton = styled(ActionButton)`
 `;
 
 const AddAttributeButton = styled(AddButton)`
-  padding: 10px 20px;
+  padding: 5px 10px;
   background: #000;
   color: #fff;
   border-radius: 20px;
   font-size: 16px;
   font-weight: 500;
   flex-shrink: 0;
-  height: 48px;
-  width: 100px;
+  height: 40px;
+  width: 80px;
   justify-content: center;
-  margin-left: auto;
 `;
 
 const SKUTableInput = styled.input`
@@ -438,7 +435,7 @@ const Products: React.FC = () => {
   const [newAttributeSelection, setNewAttributeSelection] = useState<{
     _id: string;
     name: string;
-    values: string[];
+    values: { label: string; value: string }[];
     selectedValuesForNewAttribute: string[];
   }>({
     _id: "",
@@ -544,16 +541,14 @@ const Products: React.FC = () => {
     setProductForm((prev) => ({ ...prev, name: e.target.value }));
   };
 
-  const handleSelectNewAttributeName = (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const selectedAttrId = e.target.value;
-    const attr = availableAttributes.find((a) => a._id === selectedAttrId);
+  const handleSelectNewAttributeName = (e: { value: string }) => {
+    const selectedAttrId = e.value;
+    const attr = availableAttributes?.find((a) => a._id === selectedAttrId);
     if (attr) {
       setNewAttributeSelection({
         _id: attr._id,
         name: attr.name,
-        values: attr.values,
+        values: attr.values.map((v) => ({ label: v, value: v })),
         selectedValuesForNewAttribute: [],
       });
     } else {
@@ -569,7 +564,7 @@ const Products: React.FC = () => {
   const handleSelectNewAttributeValues = (e: { value: string[] }) => {
     setNewAttributeSelection((prev) => ({
       ...prev,
-      selectedValuesForNewAttribute: e.value,
+      selectedValuesForNewAttribute: e.value as string[],
     }));
   };
 
@@ -638,17 +633,20 @@ const Products: React.FC = () => {
         (attr) => attr.values
       );
 
-   const cartesianProduct = (arrays: string[][]): string[][] => {
-  return arrays.reduce((acc, arr) => {
-    const result: string[][] = [];
-    acc.forEach(a => {
-      arr.forEach(b => {
-        result.push([...a, b]);
-      });
-    });
-    return result;
-  }, [[]] as string[][]);
-};
+      const cartesianProduct = (arrays: string[][]): string[][] => {
+        return arrays.reduce(
+          (acc, arr) => {
+            const result: string[][] = [];
+            acc.forEach((a) => {
+              arr.forEach((b) => {
+                result.push([...a, b]);
+              });
+            });
+            return result;
+          },
+          [[]] as string[][]
+        );
+      };
 
       const generatedCombinations = cartesianProduct(arraysToCombine);
 
@@ -708,7 +706,7 @@ const Products: React.FC = () => {
 
   const handleSaveProduct = async () => {
     setSavingProduct(true);
-    const skusIdsToSend = productForm.skusIds.map((sku) => sku.model); 
+    const skusIdsToSend = productForm.skusIds.map((sku) => sku.model);
 
     const dataToSend = {
       name: productForm.name.trim(),
@@ -1025,36 +1023,39 @@ const Products: React.FC = () => {
                 value={newAttributeSelection._id}
                 onChange={handleSelectNewAttributeName}
                 id="new-attr-name"
-                data-placeholder={!newAttributeSelection.name ? " " : undefined}
-              >
-                <option value="" disabled hidden>
-                  Select Attribute
-                </option>
-                {availableAttributes
+                placeholder="Select Attribute"
+                showClear={Boolean(newAttributeSelection._id)}
+                options={availableAttributes
                   .filter(
                     (attr) =>
                       !productForm.selectedAttributes.some(
                         (selected: any) => selected.name === attr.name
                       )
                   )
-                  .map((attr) => (
-                    <option key={attr._id} value={attr._id}>
-                      {attr.name}
-                    </option>
-                  ))}
-              </Select>
+                  .map((attr) => ({ label: attr.name, value: attr._id }))}
+              />
               <Label htmlFor="new-attr-name">Attribute Name</Label>
             </FloatingFormField>
 
             <FloatingFormField style={{ flex: 1.5 }}>
-              <StyledMultiSelect
+              <MultiSelect
+                style={{
+                  width: "90%",
+                  backgroundColor: "#fff",
+                  padding: "14px",
+                  borderRadius: "20px",
+                  border: "1px solid #ddd",
+                  background: "#fff",
+                }}
+                panelClassName="panel-classname"
                 value={newAttributeSelection.selectedValuesForNewAttribute}
                 onChange={handleSelectNewAttributeValues}
                 options={newAttributeSelection.values}
-                placeholder=" "
+                placeholder={
+                  !newAttributeSelection._id && "choose Attribute Name first"
+                }
                 disabled={!newAttributeSelection._id}
                 id="new-attr-values"
-                className="p-multiselect-custom-style"
                 showClear
                 display="comma"
               />
@@ -1063,11 +1064,10 @@ const Products: React.FC = () => {
 
             {/* Add Attribute Button */}
             <AddAttributeButton
+              style={{
+                marginBottom: "25px",
+              }}
               onClick={handleAddSelectedAttribute}
-              disabled={
-                !newAttributeSelection._id ||
-                newAttributeSelection.selectedValuesForNewAttribute.length === 0
-              }
             >
               Add
             </AddAttributeButton>

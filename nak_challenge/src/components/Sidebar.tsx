@@ -61,14 +61,14 @@ const ProfilePic = styled.div`
 const LogoutButton = styled.button`
   width: 190px;
   padding: 14px 0;
-  background: #fff;
+  background: #f5f5f5;
   color:#000;
   border-radius: 24px;
   border : none;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  margin-bottom: 16px;
+  margin-bottom: 100px;
   transition: background 0.2s;
   &:hover {
     background: #e0e0e0;
@@ -115,7 +115,7 @@ const Sidebar: React.FC = () => {
                 </NavButton>
             </SidebarTop>
             <LogoutButton onClick={handleLogout}>
-                <i className=" fa fa-arrow-right-from-bracket"></i>
+                <i style={{paddingRight : "10px"}} className=" fa fa-arrow-right-from-bracket "></i>
                 {t("logout.LogOut")}
             </LogoutButton>
         </SidebarContainer>
