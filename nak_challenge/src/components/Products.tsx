@@ -77,10 +77,8 @@ const TableCell = styled.td`
 const TopBar = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: right;
-  margin-bottom: 60px;
-  margin-left: 300px;
-  // width : 70%
+  align-items: center;
+  margin-bottom: 40px;
 `;
 
 const AddButton = styled.button`
@@ -340,7 +338,7 @@ const DeleteAttributeButton = styled(ActionButton)`
   }
 `;
 
-const AddAttributeButton = styled(AddButton)`
+const AddAttributeButton = styled.button`
   padding: 5px 10px;
   background: #000;
   color: #fff;
@@ -374,7 +372,7 @@ const FormButtonRow = styled.div`
   margin-top: 40px;
 `;
 
-const UpdateButton = styled(AddButton)`
+const UpdateButton = styled.button`
   background: #000;
   color: #fff;
   padding: 12px 28px;
@@ -840,18 +838,29 @@ const Products: React.FC = () => {
   };
   return (
     <ProductsContainer>
-      <h1
-        style={{
-          fontWeight: 700,
-          marginBottom: showProductForm ? "40px" : "0",
-        }}
-      >
-        {showProductForm ? "Product" : "Products"}
-      </h1>
+      {showProductForm && (
+        <h1
+          style={{
+            fontWeight: 700,
+            marginBottom: showProductForm ? "40px" : "0",
+          }}
+        >
+          {"Product"}
+        </h1>
+      )}
 
       {!showProductForm ? (
         <>
           <TopBar>
+            <h1
+              style={{
+                fontWeight: 700,
+                marginBottom: "0px",
+                justifyContent: "flex-start",
+              }}
+            >
+              {"Products"}
+            </h1>
             <AddButton onClick={handleAddProductClick}>
               Add Product <span style={{ fontSize: 20, marginLeft: 4 }}>+</span>
             </AddButton>
@@ -1059,7 +1068,6 @@ const Products: React.FC = () => {
                 showClear
                 closeIcon
                 checkboxIcon
-                
                 display="comma"
               />
               <Label htmlFor="new-attr-values">Attribute Values</Label>

@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { zodResolver } from '@hookform/resolvers/zod';
+import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, LoginFormData } from "../stores/authStore"; // adjust path as needed
 import { useAuthStore } from "../stores/authStore";
 import { useMutation } from "@tanstack/react-query";
@@ -40,7 +40,7 @@ const Input = styled.input`
   border-radius: 32px;
   background: #f5f5f5;
   font-size: 1.1rem;
-  color:#000000;
+  color: #000000;
   font-weight: 500;
   outline: none;
   transition: box-shadow 0.2s;
@@ -56,7 +56,7 @@ const Actions = styled.div`
   justify-content: space-evenly;
   align-items: center;
   margin-top: 16px;
-  padding-left : 50px
+  padding-left: 50px;
 `;
 const SignUpButton = styled.button`
   border: 1.5px solid #000;
@@ -86,16 +86,17 @@ const ArrowButton = styled.button`
   justify-content: center;
   font-size: 1.5rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.5s;
+  padding: 20px 60px;
   &:hover {
     background: #222;
   }
 `;
 
 const ErrorMessage = styled.p`
-   color: #dc3545;
-   font-size: 0.8rem;
-   margin-top: 0.25rem;
+  color: #dc3545;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
 `;
 
 const Link = styled.a`
@@ -109,7 +110,7 @@ const Link = styled.a`
 
 const InputWrapper = styled.div`
   position: relative;
-  margin : 10px 80px;
+  margin: 10px 80px;
   border-radius: 40px;
 `;
 
@@ -180,11 +181,11 @@ const SignInPage: React.FC = () => {
             <Link href="/signup">{t("login.signUpLink")}</Link>
           </SignUpButton>
           <ArrowButton type="submit" disabled={isLoading}>
-            {mutation?.isPending ? t("common.loading") :
-              <svg width="28" height="28" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
-                <path d="M5 12h14M13 6l6 6-6 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            }
+            {mutation?.isPending ? (
+              <span style={{ fontSize: "20px" }}>{t("common.loading")}</span>
+            ) : (
+              <i className=" fa fa-arrow-right"></i>
+            )}
           </ArrowButton>
         </Actions>
       </Form>

@@ -7,14 +7,13 @@ import { useTranslation } from "react-i18next";
 const SidebarContainer = styled.div`
   width: 260px;
   background: #fff;
-  border-radius: 32px 0 0 32px;
   box-shadow: 2px 0 16px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 40px 0 24px 0;
   justify-content: space-between;
-  height : 700px
+  height : 510px
 `;
 
 
@@ -60,7 +59,8 @@ const ProfilePic = styled.div`
 `;
 const LogoutButton = styled.button`
   width: 190px;
-  padding: 14px 0;
+  padding: 12px ;
+  min-height : 20px;
   background: #f5f5f5;
   color:#000;
   border-radius: 24px;
@@ -68,7 +68,6 @@ const LogoutButton = styled.button`
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  margin-bottom: 100px;
   transition: background 0.2s;
   &:hover {
     background: #e0e0e0;

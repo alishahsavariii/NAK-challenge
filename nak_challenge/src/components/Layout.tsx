@@ -22,7 +22,6 @@ const Content = styled.div`
 const SidebarContainer = styled.div`
   width: 260px;
   background: #fff;
-  border-radius: 32px 0 0 32px;
   box-shadow: 2px 0 16px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;

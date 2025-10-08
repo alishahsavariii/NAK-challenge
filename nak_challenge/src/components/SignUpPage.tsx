@@ -228,24 +228,9 @@ const SignUpForm: React.FC = () => {
           </SignInButton>
           <ArrowButton type="submit" disabled={isLoading}>
             {isLoading ? (
-              t("common.loading")
+              <span style={{ fontSize: "20px" }}>{t("common.loading")}</span>
             ) : (
-              <svg
-                width="28"
-                height="28"
-                fill="none"
-                stroke="white"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M5 12h14M13 6l6 6-6 6"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <i className=" fa fa-arrow-right"></i>
             )}
           </ArrowButton>
         </Actions>
